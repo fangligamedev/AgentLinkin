@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  handle    String   @unique
+  name      String
+  avatarUrl String?
+  bio       String?
+  password  String
+  createdAt DateTime @default(now())
+  
+  agents Agent[]
+  jobs   Job[]
+  
+  @@map("users")
+}
+
+model Agent {
+  id                  String   @id @default(uuid())
+  name                String
+  slug                String   @unique
+  description         String?
+  emoji               String   @default("🤖")
+  ownerId             String
+  skills              String   @default("[]")
+  capabilities        String   @default("[]")
+  availabilityStatus  String   @default("available")
+  reputationScore     Float    @default(0)
+  totalTasksCompleted Int      @default(0)
+  totalEarnings       Float    @default(0)
+  successRate         Float    @default(0)
+  hourlyRateMin       Float?
+  hourlyRateMax       Float?
+  isVerified          Boolean  @default(false)
+  status              String   @default("active")
+  apiKeyHash          String?
+  createdAt           DateTime @default(now())
+  
+  owner        User            @relation(fields: [ownerId], references: [id])
+  applications JobApplication[]
+  
+  @@map("agents")
+}
+
+model Skill {
+  id              String  @id @default(uuid())
+  name            String  @unique
+  slug            String  @unique
+  description     String?
+  category        String?
+  agentsWithSkill Int     @default(0)
+  
+  @@map("skills")
+}
+
+model Job {
+  id                String   @id @default(uuid())
+  title             String
+  description       String
+  jobType           String
+  employerId        String?
+  skillsRequired    String   @default("[]")
+  difficulty        String   @default("medium")
+  estimatedHours    Int?
+  budgetType        String
+  budgetMin         Float?
+  budgetMax         Float?
+  budgetCurrency    String   @default("USD")
+  deadline          DateTime?
+  status            String   @default("open")
+  isRemote          Boolean  @default(true)
+  tags              String   @default("[]")
+  viewsCount        Int      @default(0)
+  applicationsCount Int      @default(0)
+  createdAt         DateTime @default(now())
+  
+  employer     User?            @relation(fields: [employerId], references: [id])
+  applications JobApplication[]
+  
+  @@map("jobs")
+}
+
+model JobApplication {
+  id                      String   @id @default(uuid())
+  jobId                   String
+  agentId                 String
+  coverLetter             String?
+  proposedBudget          Float?
+  estimatedCompletionDays Int?
+  status                  String   @default("pending")
+  createdAt               DateTime @default(now())
+  
+  job   Job   @relation(fields: [jobId], references: [id])
+  agent Agent @relation(fields: [agentId], references: [id])
+  
+  @@unique([jobId, agentId])
+  @@map("job_applications")
+}
+
+model Group {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  displayName String?
+  description String
+  groupType   String   @default("general")
+  memberCount Int      @default(0)
+  postCount   Int      @default(0)
+  isPublic    Boolean  @default(true)
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  posts Post[]
+  
+  @@map("groups")
+}
+
+model Post {
+  id            String   @id @default(uuid())
+  authorType    String
+  authorId      String
+  title         String?
+  content       String
+  groupId       String
+  postType      String   @default("discussion")
+  upvotesCount  Int      @default(0)
+  downvotesCount Int     @default(0)
+  commentsCount Int      @default(0)
+  viewsCount    Int      @default(0)
+  status        String   @default("active")
+  createdAt     DateTime @default(now())
+  
+  group    Group     @relation(fields: [groupId], references: [id])
+  comments Comment[]
+  
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  postId    String
+  parentId  String?
+  authorType String
+  authorId  String
+  content   String
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  post Post @relation(fields: [postId], references: [id])
+  
+  @@map("comments")
+}
