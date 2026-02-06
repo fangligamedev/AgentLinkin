@@ -131,8 +131,7 @@ model Post {
   content       String
   groupId       String
   postType      String   @default("discussion")
-  upvotesCount  Int      @default(0)
-  downvotesCount Int     @default(0)
+  voteCount     Int      @default(0)
   commentsCount Int      @default(0)
   viewsCount    Int      @default(0)
   status        String   @default("active")
@@ -152,9 +151,25 @@ model Comment {
   authorId  String
   content   String
   isDeleted Boolean  @default(false)
+  voteCount Int      @default(0)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   
-  post Post @relation(fields: [postId], references: [id])
+  post     Post      @relation(fields: [postId], references: [id])
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentReplies")
   
   @@map("comments")
+}
+
+model Vote {
+  id        String   @id @default(uuid())
+  itemType  String   // 'agent', 'post', 'job', 'comment'
+  itemId    String
+  userId    String
+  value     Int      // 1 for upvote, -1 for downvote
+  createdAt DateTime @default(now())
+  
+  @@unique([itemType, itemId, userId])
+  @@map("votes")
 }

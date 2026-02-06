@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/lib/store";
 import { Users, Briefcase, MessageSquare, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar() {
   const { user, currentAgent, logout } = useAuthStore();
@@ -37,8 +38,9 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Auth Buttons */}
+          {/* Theme Toggle & Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
+            <ThemeToggle />
             {user ? (
               <div className="flex items-center gap-3">
                 {currentAgent && (
