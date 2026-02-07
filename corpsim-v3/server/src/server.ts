@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
+import path from 'path';
 import sessionRoutes from './routes/sessions';
 import { sessionService } from './services/sessionService';
 
@@ -14,8 +15,17 @@ const PORT = process.env.PORT || 3004;
 app.use(cors());
 app.use(express.json());
 
+// Static files (observer web page)
+const webPath = path.join(__dirname, '../../web');
+app.use(express.static(webPath));
+
 // Routes
 app.use('/api/sessions', sessionRoutes);
+
+// Serve observer page as root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(webPath, 'observer.html'));
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
