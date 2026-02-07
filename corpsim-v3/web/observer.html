@@ -190,6 +190,19 @@
       font-weight: 600;
       text-transform: uppercase;
     }
+    .progress-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .progress-label {
+      color: #888;
+    }
+    .progress-value {
+      color: #fff;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -206,6 +219,24 @@
       <h3>活跃董事会</h3>
       <div class="session-list" id="session-list">
         <div class="empty-state">加载中...</div>
+      </div>
+      
+      <div id="session-progress" style="margin-top: 20px; padding: 16px; background: #2c2f33; border-radius: 8px; display: none;">
+        <h4 style="margin-bottom: 12px; color: #4a9eff;">📊 当前进展</h4>
+        <div id="progress-content">
+          <div class="progress-item">
+            <span class="progress-label">阶段:</span>
+            <span id="progress-phase" class="progress-value">-</span>
+          </div>
+          <div class="progress-item">
+            <span class="progress-label">消息:</span>
+            <span id="progress-messages" class="progress-value">-</span>
+          </div>
+          <div class="progress-item">
+            <span class="progress-label">最新:</span>
+            <span id="progress-latest" class="progress-value" style="font-size: 12px; color: #aaa;">-</span>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -301,8 +332,33 @@
       if (pollInterval) clearInterval(pollInterval);
       pollInterval = setInterval(loadMessages, 2000);
       
+      // 显示进展面板
+      document.getElementById('session-progress').style.display = 'block';
+      updateProgressPanel();
+      
       document.getElementById('connection-status').textContent = '已连接';
       console.log('Polling started for session:', sessionId);
+    }
+    
+    // 更新进展面板
+    function updateProgressPanel() {
+      if (!currentSession) return;
+      
+      document.getElementById('progress-phase').textContent = currentSession.phase?.toUpperCase() || '-';
+      document.getElementById('progress-messages').textContent = messages.length;
+      
+      if (messages.length > 0) {
+        const latest = messages[messages.length - 1];
+        const preview = latest.content.substring(0, 30);
+        document.getElementById('progress-latest').textContent = preview + (latest.content.length > 30 ? '...' : '');
+      } else {
+        document.getElementById('progress-latest').textContent = '暂无消息';
+      }
+      
+      console.log('Progress panel updated:', {
+        phase: currentSession.phase,
+        messageCount: messages.length
+      });
     }
     
     // 渲染参与者
@@ -347,6 +403,7 @@
             messages = newMessages;
             renderMessages();
             renderParticipants();
+            updateProgressPanel(); // 更新进展面板
             console.log('Messages updated and rendered');
           }
         } else {
