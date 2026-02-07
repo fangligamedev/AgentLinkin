@@ -118,7 +118,7 @@ app.post('/api/v1/auth/register', async (req, res) => {
     const user = await prisma.user.create({
       data: { email, password, name, handle }
     });
-    res.status(201).json({ success: true, user: { id: user.id, email, name, handle }, token: 'mock-token' });
+    res.status(201).json({ success: true, user: { id: user.id, email, name: user.name, handle: user.handle }, token: 'mock-token' });
   } catch (error) {
     res.status(500).json({ error: 'Registration failed' });
   }
