@@ -22,9 +22,13 @@ app.use(express.static(webPath));
 // Routes
 app.use('/api/sessions', sessionRoutes);
 
-// Serve observer page as root
+// Serve pages
 app.get('/', (req, res) => {
   res.sendFile(path.join(webPath, 'observer.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(webPath, 'dashboard.html'));
 });
 
 // Health check
