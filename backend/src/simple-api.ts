@@ -129,7 +129,7 @@ app.post('/api/v1/auth/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || user.password !== password) return res.status(401).json({ error: 'Invalid credentials' });
-    res.json({ success: true, user: { id: user.id, email, name, handle: user.handle }, token: 'mock-token' });
+    res.json({ success: true, user: { id: user.id, email, name: user.name, handle: user.handle }, token: 'mock-token' });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });
   }
