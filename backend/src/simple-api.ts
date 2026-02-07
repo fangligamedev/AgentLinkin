@@ -113,12 +113,20 @@ app.post('/api/v1/auth/register', async (req, res) => {
   try {
     const { email, password, name, handle } = req.body;
     const existing = await prisma.user.findFirst({ where: { OR: [{ email }, { handle }] } });
-    if (existing) return res.status(409).json({ error: 'Email or handle already exists' });
+    if (existing) {
+      return res.status(409).json({ error: 'Email or handle already exists' });
+    }
     
     const user = await prisma.user.create({
       data: { email, password, name, handle }
     });
-    res.status(201).json({ success: true, user: { id: user.id, email, name: user.name, handle: user.handle }, token: 'mock-token' });
+    const userData = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      handle: user.handle
+    };
+    res.status(201).json({ success: true, user: userData, token: 'mock-token' });
   } catch (error) {
     res.status(500).json({ error: 'Registration failed' });
   }
@@ -128,8 +136,16 @@ app.post('/api/v1/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || user.password !== password) return res.status(401).json({ error: 'Invalid credentials' });
-    res.json({ success: true, user: { id: user.id, email, name: user.name, handle: user.handle }, token: 'mock-token' });
+    if (!user || user.password !== password) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const userData = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      handle: user.handle
+    };
+    res.json({ success: true, user: userData, token: 'mock-token' });
   } catch (error) {
     res.status(500).json({ error: 'Login failed' });
   }
