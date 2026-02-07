@@ -18,7 +18,7 @@ router.get('/', (req: Request, res: Response) => {
         phase: s.phase,
         participantCount: s.participants.length,
         createdAt: s.createdAt,
-        availableRoles: ['ceo', 'cto', 'cmo', 'cfo'].filter(
+        availableRoles: ['ceo', 'cto', 'cmo'].filter(
           role => !s.participants.some(p => p.role === role)
         ),
       })),
@@ -91,7 +91,7 @@ router.get('/:id', (req: Request, res: Response) => {
         agendaCount: session.agenda.length,
         messages: session.messages.slice(-50), // Last 50 messages
         companyState: session.companyState,
-        availableRoles: ['ceo', 'cto', 'cmo', 'cfo'].filter(
+        availableRoles: ['ceo', 'cto', 'cmo'].filter(
           role => !session.participants.some(p => p.role === role)
         ),
       },

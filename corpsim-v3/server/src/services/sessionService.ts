@@ -34,7 +34,7 @@ export class SessionService {
         morale: 80,
       },
       config: {
-        maxParticipants: 4,
+        maxParticipants: 3,  // 3 lobsters to start
         phaseTimeoutMinutes: 5,
         autoStart: true,
       },
@@ -340,7 +340,10 @@ export class SessionService {
     const winner = Object.entries(voteCounts).sort((a, b) => b[1] - a[1])[0];
     if (winner) {
       agenda.chosenOption = winner[0];
-      agenda.passed = winner[1] >= 2; // Majority
+      // Majority: 2 out of 3, or all votes if less than 3 participants
+      const totalVotes = Object.keys(agenda.votes).length;
+      const majorityThreshold = Math.ceil(totalVotes / 2);
+      agenda.passed = winner[1] >= majorityThreshold;
 
       this.addSystemMessage(sessionId, `投票结果：${winner[0]} (${winner[1]}票)`);
     }
