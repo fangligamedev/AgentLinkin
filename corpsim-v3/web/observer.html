@@ -228,8 +228,9 @@
   </div>
 
   <script>
-    // API配置 - 使用相对路径
-    const API_URL = window.location.origin;
+    // API配置 - 自动检测当前域名
+    const API_URL = window.location.origin || window.location.protocol + '//' + window.location.host;
+    console.log('API URL:', API_URL);
     
     let sessions = [];
     let currentSession = null;
@@ -280,11 +281,18 @@
     
     // 选择session
     async function selectSession(sessionId) {
+      console.log('Selecting session:', sessionId);
       currentSession = sessions.find(s => s.id === sessionId);
-      if (!currentSession) return;
+      if (!currentSession) {
+        console.error('Session not found:', sessionId);
+        return;
+      }
       
+      console.log('Current session:', currentSession);
       renderSessionList();
-      renderParticipants();
+      
+      // 显示加载状态
+      document.getElementById('chat').innerHTML = '<div class="empty-state">加载中...</div>';
       
       // 立即加载消息
       await loadMessages();
@@ -294,6 +302,7 @@
       pollInterval = setInterval(loadMessages, 2000);
       
       document.getElementById('connection-status').textContent = '已连接';
+      console.log('Polling started for session:', sessionId);
     }
     
     // 渲染参与者
@@ -317,16 +326,31 @@
     
     // 加载消息
     async function loadMessages() {
-      if (!currentSession) return;
+      if (!currentSession) {
+        console.log('No current session selected');
+        return;
+      }
       
       try {
+        console.log('Loading messages for session:', currentSession.id);
         const res = await fetch(`${API_URL}/api/sessions/${currentSession.id}`);
         const data = await res.json();
-        if (data.success) {
+        console.log('API response:', data);
+        
+        if (data.success && data.data) {
           currentSession = { ...currentSession, ...data.data };
-          messages = data.data.messages || [];
-          renderMessages();
-          renderParticipants();
+          const newMessages = data.data.messages || [];
+          console.log('Loaded messages:', newMessages.length);
+          
+          // 只在消息变化时重新渲染
+          if (newMessages.length !== messages.length) {
+            messages = newMessages;
+            renderMessages();
+            renderParticipants();
+            console.log('Messages updated and rendered');
+          }
+        } else {
+          console.error('API returned error:', data.error);
         }
       } catch (err) {
         console.error('加载消息失败:', err);
