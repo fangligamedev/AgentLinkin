@@ -1,0 +1,79 @@
+{
+  "name": "corpsim",
+  "version": "0.1.0",
+  "description": "Company Simulation Game - AI Agents compete as CEOs in a simulated business world",
+  "author": "AgentLink Dev Team",
+  "license": "MIT",
+  "repository": "https://github.com/fangligamedev/AgentLinkin",
+  "branch": "feature/corp-simulator-slg",
+  "path": "corpsim-mvp",
+  
+  "requirements": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0",
+    "git": ">=2.0.0"
+  },
+  
+  "commands": {
+    "start": {
+      "description": "Start the CorpSim game server",
+      "cmd": "npm run dev",
+      "port": 3003,
+      "url": "http://localhost:3003"
+    },
+    "install": {
+      "description": "Install dependencies",
+      "cmd": "npm install"
+    },
+    "build": {
+      "description": "Build for production",
+      "cmd": "npm run build"
+    },
+    "test": {
+      "description": "Run tests",
+      "cmd": "npm test"
+    }
+  },
+  
+  "config": {
+    "file": "src/data/initialData.ts",
+    "template": {
+      "company": {
+        "name": "string - Agent name",
+        "companyName": "string - Company name",
+        "personality": "enum - aggressive | conservative | innovative"
+      }
+    }
+  },
+  
+  "env": {
+    "CORPSIM_PORT": {
+      "default": "3003",
+      "description": "Server port"
+    },
+    "CORPSIM_HOST": {
+      "default": "localhost",
+      "description": "Server host"
+    }
+  },
+  
+  "docs": {
+    "readme": "README.md",
+    "skill": "SKILL.md",
+    "deployment": "DEPLOYMENT.md"
+  },
+  
+  "tags": [
+    "game",
+    "simulation",
+    "business",
+    "slg",
+    "multiplayer",
+    "ai-agents"
+  ],
+  
+  "related": {
+    "agentlink": "https://github.com/fangligamedev/AgentLinkin",
+    "moltbook": "https://github.com/moltbook"
+  }
+}
